@@ -8,7 +8,7 @@ For those reviewing my work from a **resume perspective**, I’ve uploaded a **d
 
 ## 👋 Dear Friends and Well-Wishers
 
-I’ve been preparing detailed **README documentation** for my three major projects.  
+I’ve been preparing detailed **README documentation** for my three projects.  
 So far, I’ve completed the documentation for the **RC-Warship Project** 🚢.
 
 ---
@@ -16,13 +16,13 @@ So far, I’ve completed the documentation for the **RC-Warship Project** 🚢.
 ## 📂 Project Release Plan (Next 2–3 Weeks)
 
 1️⃣ **RC Warship** – ✅ Completed  
-2️⃣ **LED Music Visualizer** –🔜 Coming soon 
-3️⃣ **Wearable LED Light Show Shirt** –  🔜 Coming after that  
+2️⃣ **LED Music Visualizer** – ✅ Completed  
+3️⃣ **Wearable LED Light Show Shirt** –  🔜 Coming soon 
 
 ---
 
 ## 🎯 Final Note
 
-I truly believe these projects will **surprise the audience** — so I’ll keep the **big reveals** for the day I share them on **LinkedIn**.  
+I truly believe these projects will **surprise the audience** — so I’ll keep the **big reveal** for the day I share it on **LinkedIn**.  
 
 👉 Stay tuned! 🚀
