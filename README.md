@@ -205,7 +205,21 @@ The project follows a **client–server model**, where the **laptop (server)** d
 ![Export Timeline](assets/exporttimeline.PNG)
 
 
-![Export Timeline Demo](assets/exporttimeline.gif)
+
+
+---
+
+
+
+
+
+
+   ![Export Timeline Demo](assets/exporttimeline.gif)
+
+
+
+
+
 
 ---
 
@@ -218,8 +232,11 @@ After filling out the form, click **Add Marker** to place the effect.
 
 ![Add Marker Step 2](assets/addmarkertwo.PNG)
 
-![Add Marker Step 3](assets/Addmarkerpart.gif)
+---
 
+   ![Add Marker Step 3](assets/Addmarkerpart.gif)
+
+---
 - **Timeline Settings** → Define the *Start Time* and *Duration* of the effect.  
 - **Device & LED Range** → Select the *Target ESP32 ID* and LED range (e.g., `0,99` for the first 100 LEDs). Recent selections are saved to reduce typing.  
 - **Effect & Parameters** → Choose an effect (Static, FFT, Blink, Rainbow, Chase, Sparkle, Strobe, Comet, Fire).  
