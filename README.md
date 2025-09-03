@@ -76,3 +76,93 @@ Instead of hardcoding effects, you can directly interact with the **frontend tim
 
 ---
 
+## 🏗️ Architecture Behind It
+
+The project follows a **client–server model**, where the **laptop (server)** does all the heavy processing (music analysis, timeline editing, effect generation) and the **ESP32 boards (clients)** only execute LED instructions.
+
+---
+
+### 🔹 Components
+
+1. **Frontend Webpage (Timeline Editor)**  
+   - Lets users import a song.  
+   - Displays a waveform/timeline (with beat detection).  
+   - Allows placing LED events (colors, brightness, effects) in sync with the song.  
+   - Exports the design as a JSON blueprint.  
+
+2. **Python Backend Server (FastAPI + WebSockets)**  
+   - Handles uploaded audio (`.wav`) + LED timeline (`.json`).  
+   - Analyzes music (frequency/amplitude) to make patterns.  
+   - Generates LED configuration arrays for each time chunk.  
+   - Streams real-time LED data to ESP32 clients while music plays.  
+
+3. **ESP32 Clients (LED Drivers)**  
+   - Connect to Wi-Fi and listen to the server.  
+   - Receive per-frame LED color data via WebSockets.  
+   - Directly control WS2812B LED strips without heavy computation.  
+
+---
+
+### 🔹 System Workflow (Step by Step)
+
+
+![Architecture Flow](assets/architecture.PNG)
+
+#### **Step 1 → User → Frontend (Editor Page)**
+- User uploads a `.wav` music file.  
+- Configures LED timelines (color, brightness, effects, ESP32 target).  
+- Timeline UI provides play/pause/zoom/snapping controls.  
+
+#### **Step 2 → Backend (Python) → Frontend (Editor Page)**
+- Backend performs music analysis (FFT, beat detection) after preview request.  
+- Generates preview LED data arrays for synchronization.  
+- User continues editing after previewing.  
+
+#### **Step 3 → Frontend (Editor Page) ↔ Backend (Python)**
+- Frontend sends project data (timeline JSON + audio file) to backend.  
+- Backend validates and stores configuration.  
+
+#### **Step 4 → Frontend (Editor Page) → Waiting Page**
+- Once editing is done, frontend submits final project for processing.  
+- User is shown a **Waiting Page** while backend prepares LED arrays.  
+
+#### **Step 5 → Waiting Page → Show Play/Restart Page**
+- When backend finishes pre-computation, frontend switches to **Play/Restart Page**.  
+- User is notified that playback is ready.  
+
+#### **Step 6 → User → Show Play/Restart Page**
+- User triggers Play or Restart.  
+- Frontend sends control command to backend.  
+
+#### **Step 7 → Show Play/Restart Page → Backend (Python)**
+- Backend synchronizes audio playback with LED configuration streaming.  
+- Handles play, pause, restart, and sync logic.  
+- Streams LED frame data in real-time to ESP32 clients.  
+
+#### **Step 8 → Backend (Python) → ESP32 Clients**
+- Backend pushes per-frame LED data (RGB + brightness) via WebSockets.  
+- ESP32s immediately render LEDs as instructed.  
+- Continues until song ends or user stops playback.  
+
+---
+
+### 🔹 Simplified Data Flow
+
+1. User loads a song in the webpage and designs the LED timeline.  
+2. The blueprint JSON is sent to the Python backend.  
+3. Backend processes audio + blueprint → generates LED frames.  
+4. During playback, backend streams LED frames to all ESP32 clients in sync with the music.  
+5. ESP32s simply display the incoming LED data.  
+
+---
+
+### 🔹 Why This Architecture?
+
+- Keeps **ESP32 code lightweight** (only display logic).  
+- Heavy tasks (audio analysis, timeline rendering, JSON parsing) stay on the **laptop**.  
+- **Modular design** → Add more ESP32 devices without changing the core system.  
+- **WebSockets** ensure real-time synchronization across devices.  
+
+![Client Server Diagram](assets/architecture2.PNG)
+
+
