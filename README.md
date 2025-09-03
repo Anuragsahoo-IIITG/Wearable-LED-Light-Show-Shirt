@@ -166,3 +166,99 @@ The project follows a **client–server model**, where the **laptop (server)** d
 ![Client Server Diagram](assets/architecture2.PNG)
 
 
+
+## 🌐 A Closer Look at the Frontend Webpage
+
+### 🖋️ Signature Header & Device Monitor
+
+- **"Anu Woow !!!" (Animated Title)**  
+  A decorative, glowing text at the top that acts as a brand and personal signature for the editor.  
+  ![Signature Header](assets/AnuWoowName.PNG)
+
+- **Connected ESP32 Devices List**  
+  Displays the ID and IP address of each connected ESP32 client.  
+  Updates in real-time via WebSockets so you can instantly see which devices are active and available for programming and previewing.  
+  ![ESP32 Connected](assets/ESP32connected.PNG)
+
+---
+
+### 📁 Project Management Controls
+
+- **Save Project As…** → Saves the current timeline as a JSON file for later editing.  
+- **Load Project** → Imports a previously saved project back into the editor.  
+- **New Project** → Clears everything to start with a blank timeline.  
+
+![Project Management](assets/projectmanagement.PNG)
+
+---
+
+### 🎵 Music Timeline & Playback
+
+- **File Upload (WAV only)** → The first step in creating a project is importing a WAV audio file.  
+- **Waveform Display** → Powered by *WaveSurfer.js*, gives a precise view of the music for aligning markers.  
+- **Playback Controls** → Play/Pause button with a Current Time / Total Duration display for precise editing.  
+
+![Play Pause](assets/playpausemusic.PNG)  
+![Music Attached](assets/musicattached.gif)
+
+- **Export Timeline** → Uploads the entire timeline and audio to the backend server to begin the processing stage.  
+![Export Timeline](assets/exporttimeline.PNG)
+
+
+![Export Timeline Demo](assets/exporttimeline.gif)
+
+---
+
+### ➕ Adding a New LED Marker
+
+The core creative tool for defining lighting events on the timeline.  
+After filling out the form, click **Add Marker** to place the effect.
+
+![Add Marker Step 1](assets/addmarkerone.PNG)  
+
+![Add Marker Step 2](assets/addmarkertwo.PNG)
+
+![Add Marker Step 3](assets/Addmarkerpart.gif)
+
+- **Timeline Settings** → Define the *Start Time* and *Duration* of the effect.  
+- **Device & LED Range** → Select the *Target ESP32 ID* and LED range (e.g., `0,99` for the first 100 LEDs). Recent selections are saved to reduce typing.  
+- **Effect & Parameters** → Choose an effect (Static, FFT, Blink, Rainbow, Chase, Sparkle, Strobe, Comet, Fire).  
+  - Dynamic input fields appear to fine-tune parameters like color, speed, or density.  
+
+---
+
+### 🔍 Timeline Overview & Editing
+
+- **LED Timeline Markers List**  
+  Scrollable list displaying all added markers.  
+  Each marker shows key details and includes a **Delete Button** for easy removal.  
+
+![Timeline Color](assets/timelinecolour.PNG)  
+
+![Timeline Edit/Delete](assets/timelineeditdelete.PNG)
+
+- **Filters**  
+  Manage large projects by filtering markers by ESP32 device or by time range.  
+  ![Timeline Filter](assets/timelinefilter.PNG)
+
+- **Preview Section**  
+  Test a small segment of the music by entering a *Start Time* and *End Time*.  
+  The Preview Button sends only that section to the backend for quick test playback.  
+
+![Preview Section](assets/previewsection.PNG)
+
+---
+
+## 🖥️ A Deep Dive into the Backend Python Server
+
+The backend server is the **brain** of the LED Shirt Editor system.  
+Written in **Python with FastAPI**, it handles all heavy-lifting tasks that the lightweight ESP32 clients can’t.
+
+**Core Responsibilities:**
+- Handling audio and timeline uploads from the frontend.  
+- Analyzing music (FFT, energy, Zero Crossing Rate, etc.) and generating LED effect sequences.  
+- Managing real-time communication with ESP32 LED clients via WebSockets.  
+- Synchronizing music playback with LED data streaming so lights stay perfectly in time with the audio.  
+
+
+
