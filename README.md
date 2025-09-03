@@ -219,8 +219,7 @@ After filling out the form, click **Add Marker** to place the effect.
 ![Add Marker Step 2](assets/addmarkertwo.PNG)
 
 ---
-
-   ![Add Marker Step 3](assets/Addmarkerpart.gif)
+\t \t <img src="assets/Addmarkerpart.gif" alt="Export Timeline" width="500"/>
 
 ---
 - **Timeline Settings** → Define the *Start Time* and *Duration* of the effect.  
