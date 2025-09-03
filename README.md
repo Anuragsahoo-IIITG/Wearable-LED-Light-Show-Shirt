@@ -219,7 +219,7 @@ After filling out the form, click **Add Marker** to place the effect.
 ![Add Marker Step 2](assets/addmarkertwo.PNG)
 
 ---
-### Demo Marker Adding
+## 🎥 Demo
 
 <img src="assets/Addmarkerpart.gif" alt="Export Timeline" width="500"/>
 
@@ -264,5 +264,115 @@ Written in **Python with FastAPI**, it handles all heavy-lifting tasks that the 
 - Managing real-time communication with ESP32 LED clients via WebSockets.  
 - Synchronizing music playback with LED data streaming so lights stay perfectly in time with the audio.  
 
+
+## ⚙️ Architecture
+
+The server has four main responsibilities:
+
+### 1. Project Upload and Processing
+- Users upload a `.wav` file and an LED timeline configuration from the frontend.  
+- The server saves the files, analyzes the audio in chunks, and generates JSON sequences that describe the LED effects.  
+
+### 2. Effect Generation
+- Each supported effect (`STATIC`, `BLINK`, `SPARKLE`, `COMET`, `RAINBOW`, `CHASE`, `STROBE`, `FIRE`, `FFT`) has its own sequence generator function.  
+- These functions transform music features (energy, frequency, zero-crossing rate) into LED control instructions.  
+
+**Examples:**  
+- **FFT** → Maps bass/mid/treble energy into RGB values.  
+- **SPARKLE** → Creates random LED fades, with intensity based on music energy and zero-crossing rate.  
+- **COMET** → Generates moving light trails, with number and size determined by music speed.  
+
+### 3. Playback and Preview
+- **Full Playback (`/start-playback`)** → Plays the entire audio file while streaming the full LED data sequence.  
+- **Preview Mode (`/start-preview`)** → Plays only a trimmed section of the audio and timeline for quick testing.  
+
+### 4. ESP32 Communication
+- ESP32 clients connect via the **`/ws/esp32`** endpoint, each identified by a unique `device_id`.  
+- The server sends per-chunk LED instructions as JSON packets via WebSockets during playback.  
+- Dashboards (frontends) can also connect to a separate **`/ws/dashboard`** endpoint to monitor connected ESP32 devices in real-time.  
+- A **heartbeat system** automatically removes disconnected ESP32s from the active list.  
+
+---
+
+### 🔌 Key Code Components
+
+- **FastAPI + WebSockets** → Core frameworks for API + real-time LED streaming.  
+- **`ConnectionManager`** → Class that tracks all connected ESP32 devices & dashboards and manages broadcasting updates.  
+- **`get_all_sequences()`** → Central function that generates all LED sequences based on the uploaded audio and timeline.  
+- **Effect Generators** → Functions like `generate_fft_sequence()` and `generate_sparkle_sequence()` produce the effect data.  
+- **Audio Streaming (`sounddevice`)** → Library used to play audio on the server while sending LED data in sync.  
+
+---
+
+### 📂 Files and Outputs
+
+- **Uploaded Audio** → `uploaded_audio/uploaded.wav`  
+- **Timeline Config** → `led_timeline.json`  
+- **Precomputed Sequences** → `all_sequences.json`  
+- **ESP32 Commands** → Sent live as WebSocket JSON messages  
+
+---
+
+## ⚡ A Deep Dive into the ESP32 Client
+
+The **ESP32** is a low-power microcontroller with built-in Wi-Fi, making it the perfect choice for this project.  
+Its job is to act as a **lightweight LED executor** that smoothly displays the effects defined in the editor.  
+
+### Role & Communication
+- The ESP32 does **not** perform heavy processing.  
+- It maintains a WebSocket connection to the Python server and listens for real-time LED instructions.  
+- The server streams per-frame LED data, and the ESP32 parses packets and updates LEDs immediately.  
+
+### Key Features
+- **Non-blocking design** → Uses `millis()`-based loops instead of delays, so it can handle Wi-Fi + LED updates simultaneously.  
+- **Configurable Effects** → Supports Static, Blink, Sparkle, Comet, etc., with parameters for duration, color, brightness, and LED ranges.  
+- **Smooth Transitions** → Can run multiple effects simultaneously on different LED segments and transition smoothly across timeline events.  
+
+### Packet Handling
+- Each JSON packet defines a command for the ESP32.  
+- Includes **target LED range, effect type, color/brightness values, and effect-specific parameters** (e.g., speed, fade).  
+- ESP32 decodes the packet and applies the effect immediately.  
+
+### Scalability
+- Each ESP32 only processes its **assigned LED ranges**.  
+- Multiple ESP32s can run simultaneously on the same Wi-Fi network.  
+- Enables **large synchronized light shows** across multiple wearables.  
+
+### Why ESP32?
+- **Built-in Wi-Fi** → Seamless WebSocket communication.  
+- **Timing-sensitive control** → Strong enough to drive WS2812B LEDs with precise timing.  
+- **Power + Cost Efficiency** → Low-cost, low-power, but still powerful for smooth animations.  
+
+---
+
+## 🛠️ Problems and Challenges Faced in Each Section
+
+When I started this project during my **B.Tech in Electronics and Communications**, my programming background was limited:  
+- C (1st year), Java (3rd semester), but little knowledge of **HTML, CSS, JavaScript**.  
+- **Python was completely new** — I learned it through this project.  
+
+### Main Challenges
+- **Learning New Languages & Tools** → Lots of trial-and-error, relying on AI tools (ChatGPT, Gemini) for help.  
+- **Real-time Synchronization** → Initially LEDs didn’t sync with beats at all; fixing this took multiple iterations.  
+- **Dividing Processing** → Designing so the backend does heavy work and ESP32 only executes. Balancing was tricky.  
+- **Webpage Design & UI** → Deciding layout, controls, input handling, and visual design was challenging as a beginner.  
+- **Bridging Hardware + Software** → Learning how software inputs control hardware outputs was a major step.  
+- **System Architecture** → Took multiple revisions before finalizing reliable frontend–backend–ESP32 communication.  
+
+---
+
+## 🚀 How Powerful This System Is
+
+This system is designed with **scalability and flexibility** at its core.  
+
+- **Supports Multiple ESP32s** → Theoretically up to 100 at once, each driving its own LED strip.  
+- **Per-LED Control** → Every LED is individually programmable. You can define exact behavior for every moment.  
+- **Modular Architecture** → Easily extendable with new effects without changing the core system.  
+- **Creative Freedom** → From subtle fades to complex professional-grade light shows, you control every detail.  
+
+This flexibility allows use across:  
+- Wearable fashion (shirts, trousers, hats)  
+- Stage performances  
+- Room-scale or prop-based synchronized light shows  
 
 
