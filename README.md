@@ -371,7 +371,7 @@ This system is designed with **scalability and flexibility** at its core.
 - **Creative Freedom** → From subtle fades to complex professional-grade light shows, you control every detail.  
 
 
-![Powerful_Tool](assets/powerfultool.PNG)
+![Powerful_Tool](assets/powerfultool.png)
 
 
 This flexibility allows use across:  
