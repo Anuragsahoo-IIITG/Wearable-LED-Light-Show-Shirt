@@ -106,7 +106,7 @@ The project follows a **client–server model**, where the **laptop (server)** d
 ### 🔹 System Workflow (Step by Step)
 
 
-![Architecture Flow](assets/architecture.PNG)
+![Architecture Flow](assets/architecture.png)
 
 #### **Step 1 → User → Frontend (Editor Page)**
 - User uploads a `.wav` music file.  
