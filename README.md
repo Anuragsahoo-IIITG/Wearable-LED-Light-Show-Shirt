@@ -370,6 +370,10 @@ This system is designed with **scalability and flexibility** at its core.
 - **Modular Architecture** → Easily extendable with new effects without changing the core system.  
 - **Creative Freedom** → From subtle fades to complex professional-grade light shows, you control every detail.  
 
+
+![Powerful_Tool](assets/powerfultool.PNG)
+
+
 This flexibility allows use across:  
 - Wearable fashion (shirts, trousers, hats)  
 - Stage performances  
