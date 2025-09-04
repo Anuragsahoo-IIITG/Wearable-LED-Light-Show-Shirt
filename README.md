@@ -1,6 +1,6 @@
 ## 📲 Connect
 Check out my LinkedIn post to see the LED show in action along with a short explaination :
-[View on LinkedIn](https://www.linkedin.com/posts/anuragsahooiiitg_python-esp32-music-activity-7364728191019581440-z80a?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEUPUs4BoMkNzV_gEMUQyDOiyVkbyLPoc48)
+[View on LinkedIn](https://www.linkedin.com/posts/anuragsahooiiitg_leds-esp32-python-activity-7369448391237328901-YXaX?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEUPUs4BoMkNzV_gEMUQyDOiyVkbyLPoc48)
 
 I’d love to connect with professionals, researchers, and enthusiasts in the fields of **embedded systems, IoT, robotics, VLSI and hardware-software integration**.
 
