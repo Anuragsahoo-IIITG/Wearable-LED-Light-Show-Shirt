@@ -1,34 +1,8 @@
-# 📢 Upcoming Documentation: Wearable-LED-Light-Show-Shirt
+## 📲 Connect
+Check out my LinkedIn post to see the LED show in action along with a short explaination :
+[View on LinkedIn](https://www.linkedin.com/posts/anuragsahooiiitg_python-esp32-music-activity-7364728191019581440-z80a?utm_source=share&utm_medium=member_desktop&rcm=ACoAAEUPUs4BoMkNzV_gEMUQyDOiyVkbyLPoc48)
 
-✨ I haven’t uploaded the full **Project Demo** for this one yet — because it’s something truly exciting!
-
-For those reviewing my work from a **resume perspective**, I’ve uploaded a **demo video** showcasing the **LED-Music-Visualiser** in action.
-
----
-
-## 👋 Dear Friends and Well-Wishers
-
-I’ve been preparing detailed **README documentation** for my three projects.  
-So far, I’ve completed the documentation for the **RC-Warship Project** 🚢.
-
----
-
-## 📂 Project Release Plan (Next 2–3 Weeks)
-
-1️⃣ **RC Warship** – ✅ Completed  
-2️⃣ **LED Music Visualizer** – ✅ Completed  
-3️⃣ **Wearable LED Light Show Shirt** –  🔜 Coming soon 
-
----
-
-## 🎯 Final Note
-
-I truly believe these projects will **surprise the audience** — so I’ll keep the **big reveal** for the day I share it on **LinkedIn**.  
-
-👉 Stay tuned! 🚀
-
-
-
+I’d love to connect with professionals, researchers, and enthusiasts in the fields of **embedded systems, IoT, robotics, VLSI and hardware-software integration**.
 
 # LED Shirt Editor
 
