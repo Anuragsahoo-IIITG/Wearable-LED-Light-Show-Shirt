@@ -172,7 +172,7 @@ The project follows a **client–server model**, where the **laptop (server)** d
 ### 🖋️ Signature Header & Device Monitor
 
 - **"Anu Woow !!!" (Animated Title)**  
-  A decorative, glowing text at the top that acts as a brand and personal signature for the editor.  
+  A decorative, glowing text at the top that acts as my brand and personal signature for the editor.  
   ![Signature Header](assets/AnuWoowName.PNG)
 
 - **Connected ESP32 Devices List**  
