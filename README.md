@@ -204,9 +204,13 @@ The project follows a **client–server model**, where the **laptop (server)** d
 - **Export Timeline** → Uploads the entire timeline and audio to the backend server to begin the processing stage.  
 
 
-| Export Timeline (PNG) | Export Timeline Demo (GIF) |
-|------------------------|----------------------------|
-| <img src="assets/exporttimeline.PNG" alt="Export Timeline" width="500"/> | <img src="assets/exporttimeline.gif" alt="Export Timeline" width="500"/>  |
+| Export Timeline (PNG)  |
+|------------------------|
+| <img src="assets/exporttimeline.PNG" alt="Export Timeline" width="500"/> |
+
+| Export Timeline (Gif)  |
+|------------------------|
+| <img src="assets/exporttimeline.gif" alt="Export Timeline" width="500"/>  |
 
 
 ### ➕ Adding a New LED Marker
