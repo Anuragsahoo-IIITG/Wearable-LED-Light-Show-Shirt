@@ -206,11 +206,11 @@ The project follows a **client–server model**, where the **laptop (server)** d
 
 | Export Timeline (PNG)  |
 |------------------------|
-| <img src="assets/exporttimeline.PNG" alt="Export Timeline" width="500"/> |
+| <img src="assets/exporttimeline.PNG" alt="Export Timeline" width="700"/> |
 
 | Export Timeline (Gif)  |
 |------------------------|
-| <img src="assets/exporttimeline.gif" alt="Export Timeline" width="500"/>  |
+| <img src="assets/exporttimeline.gif" alt="Export Timeline" width="700"/>  |
 
 
 ### ➕ Adding a New LED Marker
