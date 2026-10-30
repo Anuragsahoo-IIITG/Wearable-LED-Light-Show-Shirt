@@ -1,0 +1,1190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title> Anu WooW !!!'s ESP32 Device Monitor & LED Timeline Editor</title>
+  <script src="https://unpkg.com/wavesurfer.js"></script>
+  <style>
+
+    /* .wow-text {*/
+    /*  position: absolute;*/
+    /*  top: 20px;*/
+    /*  right: 20px;*/
+    /*  font-size: 2.5rem;*/
+    /*  font-weight: bold;*/
+    /*  background: linear-gradient(45deg, #ff8a00, #e52e71);*/
+    /*  -webkit-background-clip: text;*/
+    /*  background-clip: text;*/
+    /*  color: transparent;*/
+    /*  text-shadow: 0 0 8px rgba(229, 46, 113, 0.5);*/
+    /*  z-index: 10;*/
+    /*  animation: glow 2s ease-in-out infinite alternate;*/
+    /*}*/
+
+    /*@keyframes glow {*/
+    /*  from {*/
+    /*    text-shadow: 0 0 8px rgba(229, 46, 113, 0.5);*/
+    /*  }*/
+    /*  to {*/
+    /*    text-shadow: 0 0 15px rgba(229, 46, 113, 0.8),*/
+    /*                 0 0 25px rgba(255, 138, 0, 0.6);*/
+    /*  }*/
+    /*}*/
+
+    /* Your Signature Text Style */
+     /* Neon Signature Style */
+     /* Updated Signature Text Style - Subway Surfers inspired */
+    /* Updated Signature Text Style - Focused breathing text */
+    #signatureText {
+      font-family: 'Bungee Shade', cursive;
+      font-size: 3em;
+      color: #FFEB3B; /* Funky Yellow */
+      text-shadow:
+        0 0 5px rgba(255, 235, 59, 0.8),
+        0 0 10px rgba(255, 235, 59, 0.6),
+        0 0 20px rgba(255, 235, 59, 0.4),
+        0 0 40px rgba(255, 174, 0, 0.2);
+      display: inline-block;
+      padding: 10px 25px;
+      border-radius: 8px;
+      background: linear-gradient(145deg, #0a192f 0%, #0d2342 100%); /* Subtle navy gradient */
+      box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.3),
+        inset 0 2px 5px rgba(255, 235, 59, 0.1);
+      animation:
+        textBreathing 3s ease-in-out infinite,
+        textGlow 2s ease-in-out infinite alternate;
+      letter-spacing: 3px;
+      text-align: center;
+      margin: 20px 0;
+      transform: perspective(500px) rotateX(10deg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Text breathing animation */
+    @keyframes textBreathing {
+      0%, 100% {
+        transform: perspective(500px) rotateX(10deg) scale(1);
+        text-shadow:
+          0 0 5px rgba(255, 235, 59, 0.8),
+          0 0 10px rgba(255, 235, 59, 0.6),
+          0 0 20px rgba(255, 235, 59, 0.4),
+          0 0 40px rgba(255, 174, 0, 0.2);
+      }
+      50% {
+        transform: perspective(500px) rotateX(10deg) scale(1.08);
+        text-shadow:
+          0 0 8px rgba(255, 235, 59, 0.9),
+          0 0 16px rgba(255, 235, 59, 0.7),
+          0 0 30px rgba(255, 235, 59, 0.5),
+          0 0 60px rgba(255, 174, 0, 0.3);
+      }
+    }
+
+    /* Text glow pulsation */
+    @keyframes textGlow {
+      0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        color: #FFEB3B;
+        text-shadow:
+          0 0 5px rgba(255, 235, 59, 0.8),
+          0 0 10px rgba(255, 235, 59, 0.6),
+          0 0 20px rgba(255, 235, 59, 0.4),
+          0 0 40px rgba(255, 174, 0, 0.2);
+      }
+      20%, 24%, 55% {
+        color: #FFC107;
+        text-shadow:
+          0 0 3px rgba(255, 235, 59, 0.6),
+          0 0 6px rgba(255, 235, 59, 0.4),
+          0 0 12px rgba(255, 235, 59, 0.2);
+      }
+    }
+
+    /* Add a subtle shine effect */
+    #signatureText::after {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+      transform: rotate(30deg);
+      animation: shine 6s ease-in-out infinite;
+    }
+
+    @keyframes shine {
+      0%, 100% { transform: rotate(30deg) translate(-30%, -30%); }
+      50% { transform: rotate(30deg) translate(30%, 30%); }
+    }
+
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: sans-serif;
+      padding: 40px;
+    }
+
+    /* Rest of your existing styles remain exactly the same */
+    h1, h2 {
+      color: #0f0;
+    }
+
+
+    body {
+      background-color: #111;
+      color: #fff;
+      font-family: sans-serif;
+      padding: 40px;
+    }
+
+    h1, h2 {
+      color: #0f0;
+    }
+
+    #waveform {
+      margin: 20px 0;
+    }
+
+    #ledMarkers {
+      margin-top: 20px;
+    }
+
+    .marker {
+      padding: 10px;
+      border-radius: 8px;
+      margin: 10px 0;
+      position: relative;
+      border-left: 6px solid transparent; /* For ESP color indication */
+    }
+
+    .marker-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .marker-header h4 {
+      margin: 0;
+      font-size: 16px;
+      color: #ccc;
+    }
+
+    label {
+      display: block;
+      margin-top: 5px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 5px;
+      background-color: #222;
+      border: 1px solid #555;
+      color: white;
+      box-sizing: border-box; /* Include padding in width */
+    }
+
+    button {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background-color: #0f0;
+      border: none;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0c0;
+    }
+
+    .connected-count {
+      margin-top: 30px;
+      font-size: 1.2em;
+    }
+
+    .delete-button {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      background-color: red;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      font-size: 14px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    .input-box {
+      background: #222;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    .filter-box {
+      background: #222;
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+
+    /* Styles for connected ESP list */
+    #espListContainer {
+      background: #2a2a2a;
+      padding: 20px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    #espDeviceList {
+      list-style: none;
+      padding: 0;
+      margin: 10px 0 0 0;
+    }
+    #espDeviceList li {
+      padding: 5px 0;
+      border-bottom: 1px dashed #444;
+      color: #0f0;
+    }
+    #espDeviceList li:last-child {
+      border-bottom: none;
+    }
+    .no-devices {
+      color: #aaa;
+      font-style: italic;
+    }
+
+    #previewStart, #previewEnd {
+      width: 60px;
+      margin: 5px;
+    }
+
+  </style>
+    <link href="https://fonts.googleapis.com/css2?family=Bungee+Shade&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<div id="signatureText">
+    Anu Woow !!!
+</div>>
+
+<h1>📡 ESP32 Device Monitor & LED Timeline</h1>
+
+<div id="espListContainer">
+  <h2>Connected ESP32 Devices</h2>
+  <div class="connected-count">Loading...</div>
+  <ul id="espDeviceList"></ul>
+</div>
+---
+---
+<div class="project-controls">
+  <h2>📁 Project Management</h2>
+  <button id="saveProjectAsButton">💾 Save Project As...</button>
+  <button id="loadProjectButton">📂 Load Project</button>
+  <button id="newProjectButton">✨ New Project</button>
+</div>
+
+<h2>🎵 Music Timeline</h2>
+<input type="file" id="audioFile" accept=".wav">
+<div id="waveform"></div>
+<button id="playPauseButton">▶️ Play/Pause</button>
+<button id="exportTimelineButton">📤 Export Timeline</button>
+
+
+---
+<h3>🎛️ Preview Controls</h3>
+<label>Start Time (sec):</label>
+<input type="number" id="previewStart" step="0.1" min="0" value="0" />
+<label>End Time (sec):</label>
+<input type="number" id="previewEnd" step="0.1" min="0" value="5" />
+<button onclick="startPreview()">🔍 Preview</button>
+
+<div class="input-box">
+  <h3>➕ Add New LED Marker</h3>
+  <label>Start Time (sec)
+    <input type="number" id="newStartTime" step="0.1">
+  </label>
+  <label>Duration
+    <input type="number" id="newDuration" step="0.1">
+  </label>
+ <label>Target ESP32 ID
+    <input type="text" id="newDeviceId" list="espIdSuggestions">
+    <datalist id="espIdSuggestions"></datalist>
+  </label>
+  <label>Target LEDs (e.g., 0,99 or 10,20)
+    <input type="text" id="newLeds" list="ledSuggestions">
+    <datalist id="ledSuggestions"></datalist>
+  </label>
+  <label>Effect
+    <select id="newEffect">
+      <option value="STATIC">Static</option>
+      <option value="FFT">FFT</option>
+      <option value="BLINK">Blink</option>
+      <option value="RAINBOW">Rainbow</option>
+      <option value="CHASE">Chase</option>
+        <option value="SPARKLE">Sparkle</option>
+        <option value="STROBE">Strobe</option>
+        <option value="COMET">Comet</option>
+        <option value="FIRE">Fire</option>
+    </select>
+  </label>
+
+  <div id="effectParamsContainer"></div>
+
+  <button id="addMarkerButton">➕ Add Marker</button>
+</div>
+
+---
+
+<div class="filter-box">
+  <h3>🔍 Filter Markers</h3>
+  <label>Filter by ESP:
+    <select id="filterEsp"></select>
+  </label>
+  <label>Time Range:
+    <input type="number" id="timeMin" placeholder="Start (s)" step="0.1">
+    <input type="number" id="timeMax" placeholder="End (s)" step="0.1">
+  </label>
+  <button id="resetFiltersButton">Reset Filters</button>
+</div>
+
+---
+
+<div id="ledMarkers">
+  <h2>📋 LED Timeline Markers</h2>
+  </div>
+
+---
+
+
+<script>
+async function startPreview() {
+  const start = parseFloat(document.getElementById("previewStart").value);
+  const end = parseFloat(document.getElementById("previewEnd").value);
+  if (isNaN(start) || isNaN(end) || end <= start) {
+    alert("Please enter valid start and end times.");
+    return;
+  }
+
+  try {
+    const response = await fetch("http://localhost:8000/start-preview", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        start_time: start,
+        end_time: end,
+        timeline: ledTimeline // Send the current timeline state
+      })
+    });
+
+    const result = await response.json();
+    if (result.status === "ok") {
+      console.log("Preview started.");
+    } else {
+      alert("Preview failed: " + result.message);
+    }
+  } catch (err) {
+    console.error("Error starting preview:", err);
+    alert("Preview failed. Check console.");
+  }
+}
+</script>
+
+<script>
+
+    // --- Project Management Functions ---
+function saveProjectAs() {
+    const projectData = {
+        timeline: ledTimeline,
+        audioFileName: selectedWavBlob ? selectedWavBlob.name : null
+    };
+
+    const fileName = prompt("Enter project name (e.g., my_project.json):", "my_project.json");
+    if (!fileName) return;
+
+    const blob = new Blob([JSON.stringify(projectData, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+
+    alert("Project saved locally!");
+}
+
+function loadProject() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    input.onchange = () => {
+        const file = input.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const parsedData = JSON.parse(e.target.result);
+                // Reset current project
+                newProject();
+
+                // Restore timeline
+                if (parsedData.timeline) {
+                    ledTimeline = parsedData.timeline;
+                    nextMarkerId = Math.max(...ledTimeline.map(m => m.id), 0) + 1;
+                    renderMarkers();
+                }
+
+                // Optional: show warning about missing WAV file
+                if (parsedData.audioFileName) {
+                    alert(`Please re-upload the audio file: ${parsedData.audioFileName}`);
+                }
+
+                alert("Project loaded successfully!");
+            } catch (error) {
+                console.error("Error parsing project file:", error);
+                alert("Invalid project file.");
+            }
+        };
+        reader.readAsText(file);
+    };
+    input.click();
+}
+
+function newProject() {
+    if (confirm("Are you sure you want to start a new project? All unsaved changes will be lost.")) {
+        ledTimeline = [];
+        selectedWavBlob = null;
+        wavesurfer.empty(); // Clear waveform
+        renderMarkers(); // Clear displayed markers
+        resetNewMarkerForm(); // Clear new marker form
+        document.getElementById('audioFile').value = ''; // Clear file input
+        currentTimeDisplay.textContent = '0:00'; // Reset time displays
+        totalDurationDisplay.textContent = '0:00';
+        nextMarkerId = 0; // Reset marker ID counter
+        alert("New project started.");
+    }
+}
+
+// Helper function to read file content
+function readFileAsText(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (event) => resolve(event.target.result);
+        reader.onerror = (event) => reject(event.target.error);
+        reader.readAsText(file);
+    });
+}
+
+
+  // --- Global Variables ---
+  const INTERVAL_DURATION = 10; // For generating background colors based on time intervals
+  const espColors = {}; // Stores generated colors for each ESP ID for consistency
+  let selectedWavBlob = null; // Holds the uploaded audio file
+  let ledTimeline = []; // Array to store all LED marker objects
+  let nextMarkerId = 0; // Counter for assigning unique IDs to markers
+
+
+
+  // --- New: Get references to time display elements ---
+  const currentTimeDisplay = document.createElement('span');
+  currentTimeDisplay.id = 'currentTime';
+  currentTimeDisplay.textContent = '0:00';
+
+  const totalDurationDisplay = document.createElement('span');
+  totalDurationDisplay.id = 'totalDuration';
+  totalDurationDisplay.textContent = '0:00';
+
+  // Find the playPauseButton and insert the time display elements next to it
+  const playPauseButton = document.getElementById('playPauseButton');
+  if (playPauseButton) {
+      playPauseButton.parentNode.insertBefore(currentTimeDisplay, playPauseButton.nextSibling);
+      playPauseButton.parentNode.insertBefore(document.createTextNode(' / '), currentTimeDisplay.nextSibling); // Add the ' / ' separator
+      playPauseButton.parentNode.insertBefore(totalDurationDisplay, currentTimeDisplay.nextSibling.nextSibling);
+  }
+
+  // --- WebSocket Setup for ESP32 Monitoring ---
+  const ws = new WebSocket("ws://localhost:8000/ws/dashboard");
+  const deviceListElement = document.getElementById("espDeviceList");
+  const countElement = document.querySelector(".connected-count");
+
+  // Function to update the displayed list of connected ESP devices
+  function updateDeviceList(devices) {
+    deviceListElement.innerHTML = ""; // Clear existing list
+    if (devices.length === 0) {
+      deviceListElement.innerHTML = "<li class='no-devices'>No ESP32 devices connected.</li>";
+      countElement.textContent = "0 devices connected";
+      return;
+    }
+
+    // Store connected devices globally if needed for other functions
+    window.connectedEspDevices = devices;
+
+    devices.forEach(device => {
+      const listItem = document.createElement("li");
+      listItem.innerHTML = `<strong>${device.id}</strong> — IP: ${device.ip}`;
+      deviceListElement.appendChild(listItem);
+    });
+
+    countElement.textContent = `${devices.length} device(s) connected`;
+    populateNewEspIdDropdown(); // Update ESP ID suggestions
+  }
+
+  // WebSocket message handler
+  ws.onmessage = (event) => {
+    try {
+      const message = JSON.parse(event.data);
+      if (message.type === "esp_list_update") {
+        updateDeviceList(message.data);
+      }
+    } catch (e) {
+      console.error("Error parsing WebSocket message:", e);
+    }
+  };
+
+  // --- WaveSurfer Setup (Audio Waveform) ---
+  const wavesurfer = WaveSurfer.create({
+    container: '#waveform',
+    waveColor: '#555',
+    progressColor: '#0f0',
+    height: 100,
+  });
+
+  // --- New: Function to format time from seconds to MM:SS ---
+  function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.floor(seconds % 60);
+    return `${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+  }
+
+  // --- New: Event listener for when the audio is ready to play ---
+  wavesurfer.on('ready', () => {
+    totalDurationDisplay.textContent = formatTime(wavesurfer.getDuration());
+  });
+
+  // --- New: Event listener for when the audio playback progresses ---
+  wavesurfer.on('timeupdate', (time) => {
+    currentTimeDisplay.textContent = formatTime(time);
+  });
+
+
+
+  // --- Color Conversion Helpers ---
+  function rgbToHex(r, g, b) {
+    return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+  }
+
+  function hexToRgb(hex) {
+    const bigint = parseInt(hex.slice(1), 16);
+    return [(bigint >> 16) & 255, (bigint >> 8) & 255, bigint & 255];
+  }
+
+  // --- Default Parameters for LED Effects ---
+  function getDefaultParams(effect) {
+    switch (effect) {
+      case "STATIC": return { color: [255, 255, 255] };
+      case "FFT": return {}; // FFT typically doesn't have configurable parameters
+      case "BLINK": return { on_color: [255, 255, 255], off_color: [0, 0, 0], base_rate: 8, min_rate: 2 };
+      case "RAINBOW": return { hue_speed: 0.05 };
+      case "CHASE": return { chase_color: [255, 255, 255], tail_length: 5, direction: "FORWARD", base_speed: 10, max_speed: 3 };
+      case "SPARKLE": return { sparkle_color: [255,255,255],density:0.1};
+        case "STROBE": return {on_color:[255,255,255], off_color: [0,0,0], base_rate:16, min_rate:2};
+        case "COMET": return {comet_color: [255,100,0], tail_length:5,base_speed : 1, max_speed : 5};
+        case "FIRE": return {base_color: [255,100,0], flicker_intensity: 0.5};
+
+      default: return {};
+    }
+  }
+
+  // --- Functions for Adding New Markers (from the input box) ---
+  function updateEffectInputs() {
+    const effect = document.getElementById("newEffect").value;
+    const container = document.getElementById("effectParamsContainer");
+    let html = "";
+
+    if (effect === "STATIC") {
+      html = `<label>Color <input type="color" id="effectParam_color" value="#ffffff"></label>`;
+    } else if (effect === "BLINK") {
+      html = `
+        <label>On Color <input type="color" id="effectParam_on_color" value="#ffffff"></label>
+        <label>Off Color <input type="color" id="effectParam_off_color" value="#000000"></label>
+        <label>Base Rate <input type="number" id="effectParam_base_rate" value="8" step="1"></label>
+        <label>Min Rate <input type="number" id="effectParam_min_rate" value="2" step="1"></label>
+      `;
+    } else if (effect === "RAINBOW") {
+      html = `<label>Hue Speed <input type="number" id="effectParam_hue_speed" value="0.05" step="0.01"></label>`;
+    } else if (effect === "CHASE") {
+      html = `
+        <label>Chase Color <input type="color" id="effectParam_chase_color" value="#ffffff"></label>
+        <label>Tail Length <input type="number" id="effectParam_tail_length" value="5" step="1"></label>
+        <label>Direction
+          <select id="effectParam_direction">
+            <option value="FORWARD">Forward</option>
+            <option value="BACKWARD">Backward</option>
+          </select>
+        </label>
+        <label>Base Speed <input type="number" id="effectParam_base_speed" value="10" step="1"></label>
+        <label>Max Speed <input type="number" id="effectParam_max_speed" value="3" step="1"></label>
+      `;
+    }else if (effect === "SPARKLE"){
+        html = '<label>Sparkle Color <input type="color" id="effectParam_sparkle_color" value="#ffffff"></label>\n' +
+            '      <label>Density (0-1) <input type="number" id="effectParam_density" value="0.1" step="0.01" min="0" max="1"></label>';
+    }else if(effect === "STROBE"){
+       html = `
+      <label>On Color <input type="color" id="effectParam_on_color" value="#ffffff"></label>
+      <label>Off Color <input type="color" id="effectParam_off_color" value="#000000"></label>
+      <label>Base Rate (chunks, slow) <input type="number" id="effectParam_base_rate" value="16" step="1"></label>
+      <label>Min Rate (chunks, fast) <input type="number" id="effectParam_min_rate" value="2" step="1"></label>
+    `;
+    } else if (effect === "COMET"){
+      html = `
+      <label>Comet Color <input type="color" id="effectParam_comet_color" value="#ff6400"></label>
+      <label>Tail Length <input type="number" id="effectParam_tail_length" value="5" step="1"></label>
+      <label>Base Speed (LEDs/chunk) <input type="number" id="effectParam_base_speed" value="1" step="1"></label>
+      <label>Max Speed (LEDs/chunk) <input type="number" id="effectParam_max_speed" value="5" step="1"></label>
+    `;
+    }else if (effect === "FIRE"){
+       html = `
+      <label>Base Color <input type="color" id="effectParam_base_color" value="#ff6400"></label>
+      <label>Flicker Intensity (0-1) <input type="number" id="effectParam_flicker_intensity" value="0.5" step="0.01" min="0" max="1"></label>
+    `;
+    }
+    container.innerHTML = html;
+  }
+
+  function addCustomMarkerFromForm() {
+    const startSec = parseFloat(document.getElementById("newStartTime").value);
+    const duration = parseFloat(document.getElementById("newDuration").value);
+    const device_id = document.getElementById("newDeviceId").value.trim(); // Read from input
+    const newLedsString = document.getElementById("newLeds").value.trim(); // Read LED string
+    const effect = document.getElementById("newEffect").value;
+
+    // Basic validation
+    if (isNaN(startSec) || isNaN(duration) || startSec < 0 || duration <= 0) {
+      alert("Please enter valid positive start time and duration for the new marker.");
+      return;
+    }
+    if (!device_id) {
+        alert("Please enter a Target ESP32 ID for the new marker.");
+        return;
+    }
+
+    let targetLEDS = [];
+    if (newLedsString) {
+        try {
+            targetLEDS = newLedsString.split(',').map(s => {
+                const num = parseInt(s.trim(), 10);
+                if (isNaN(num) || num < 0) {
+                    throw new Error("Invalid LED number found.");
+                }
+                return num;
+            });
+            // Optional: Filter out duplicates and sort
+            targetLEDS = [...new Set(targetLEDS)].sort((a, b) => a - b);
+        } catch (e) {
+            alert("Invalid Target LEDs format. Please use comma-separated positive numbers (e.g., 0,99,10). " + e.message);
+            return;
+        }
+    } else {
+        alert("Please enter at least one Target LED for the new marker (e.g., 0, 10, 20).");
+        return;
+    }
+
+    // Get effect-specific parameters from the dynamic inputs
+    let params = getDefaultParams(effect);
+    if (effect === "STATIC") {
+      params.color = hexToRgb(document.getElementById("effectParam_color").value);
+    } else if (effect === "BLINK") {
+      params.on_color = hexToRgb(document.getElementById("effectParam_on_color").value);
+      params.off_color = hexToRgb(document.getElementById("effectParam_off_color").value);
+      params.base_rate = parseInt(document.getElementById("effectParam_base_rate").value);
+      params.min_rate = parseInt(document.getElementById("effectParam_min_rate").value);
+    } else if (effect === "RAINBOW") {
+      params.hue_speed = parseFloat(document.getElementById("effectParam_hue_speed").value);
+    } else if (effect === "CHASE") {
+      params.chase_color = hexToRgb(document.getElementById("effectParam_chase_color").value);
+      params.tail_length = parseInt(document.getElementById("effectParam_tail_length").value);
+      params.direction = document.getElementById("effectParam_direction").value;
+      params.base_speed = parseInt(document.getElementById("effectParam_base_speed").value);
+      params.max_speed = parseInt(document.getElementById("effectParam_max_speed").value);
+    } else if(effect === "SPARKLE"){
+       params.sparkle_color = hexToRgb(document.getElementById("effectParam_sparkle_color").value);
+  params.density = parseFloat(document.getElementById("effectParam_density").value);
+    } else if(effect === "STROBE"){
+        params.on_color = hexToRgb(document.getElementById("effectParam_on_color").value);
+        params.off_color = hexToRgb(document.getElementById("effectParam_off_color").value);
+        params.base_rate = parseInt(document.getElementById("effectParam_base_rate").value);
+        params.min_rate = parseInt(document.getElementById("effectParam_min_rate").value);
+    } else if (effect === "COMET"){
+       params.comet_color = hexToRgb(document.getElementById("effectParam_comet_color").value);
+       params.tail_length = parseInt(document.getElementById("effectParam_tail_length").value);
+       params.base_speed = parseInt(document.getElementById("effectParam_base_speed").value);
+       params.max_speed = parseInt(document.getElementById("effectParam_max_speed").value);
+    } else if(effect === "FIRE"){
+       params.base_color = hexToRgb(document.getElementById("effectParam_base_color").value);
+       params.flicker_intensity = parseFloat(document.getElementById("effectParam_flicker_intensity").value);
+    }
+
+    const marker = {
+      id: nextMarkerId++, // Assign a unique ID
+      start_sec: startSec,
+      end_sec: startSec + duration,
+      device_id,
+      targetLEDS,
+      effect,
+      params
+    };
+
+    ledTimeline.push(marker); // Add new marker to the array
+    renderMarkers(); // Re-render the list to show the new marker
+    resetNewMarkerForm(); // Clear the input fields for the next marker
+  }
+
+  function resetNewMarkerForm() {
+    document.getElementById("newStartTime").value = "";
+    document.getElementById("newDuration").value = "";
+    document.getElementById("newDeviceId").value = ""; // Clear the input field
+    document.getElementById("newLeds").value = ""; // Clear the input field
+    populateNewEspIdDropdown(); // Re-populate datalist after reset
+    populateNewLedsDropdown(); // Re-populate datalist after reset
+    document.getElementById("newEffect").value = "STATIC";
+    updateEffectInputs(); // Reset effect-specific inputs
+  }
+
+  // --- Marker Rendering and Filtering ---
+
+  // Generates a background color for the marker based on its time interval
+  function getIntervalColor(intervalIndex) {
+    const hue = (intervalIndex * 30) % 360;
+    return `hsl(${hue}, 70%, 20%)`;
+  }
+
+  // Generates a unique border color for each ESP ID
+  function getEspColor(espId) {
+    if (!espColors[espId]) {
+      let hash = 0;
+      for (let i = 0; i < espId.length; i++) {
+        hash = espId.charCodeAt(i) + ((hash << 5) - hash);
+      }
+      const hue = Math.abs(hash) % 360;
+      espColors[espId] = `hsl(${hue}, 70%, 30%)`;
+    }
+    return espColors[espId];
+  }
+
+  // Populates the ESP filter dropdown with unique device IDs from the timeline
+  function populateEspFilter() {
+    const filterEsp = document.getElementById("filterEsp");
+    filterEsp.innerHTML = '<option value="">All ESPs</option>'; // Default option
+
+    // Get unique ESP IDs from the current timeline markers
+    const uniqueEsp = [...new Set(ledTimeline.map(m => m.device_id).filter(Boolean))];
+    uniqueEsp.sort().forEach(espId => { // Sort for consistent display
+      const option = document.createElement("option");
+      option.value = espId;
+      option.textContent = espId;
+      filterEsp.appendChild(option);
+    });
+
+    // Restore the previously selected filter if it still exists
+    const currentFilter = filterEsp.dataset.currentFilter || "";
+    if (uniqueEsp.includes(currentFilter)) {
+        filterEsp.value = currentFilter;
+    } else {
+        filterEsp.value = ""; // Reset if current filter no longer applies
+    }
+  }
+
+  // --- Populates the newDeviceId datalist with unique ESP IDs ---
+  function populateNewEspIdDropdown() {
+      const espIdDatalist = document.getElementById("espIdSuggestions");
+      const newDeviceIdInput = document.getElementById("newDeviceId");
+      const currentInputValue = newDeviceIdInput.value;
+
+      espIdDatalist.innerHTML = ''; // Clear existing options
+
+      const uniqueEspIds = new Set();
+      // Get IDs from currently connected devices
+      if (window.connectedEspDevices) {
+          window.connectedEspDevices.forEach(device => uniqueEspIds.add(device.id));
+      }
+      // Also add IDs from the current timeline markers
+      ledTimeline.forEach(marker => {
+          if (marker.device_id) {
+              uniqueEspIds.add(marker.device_id);
+          }
+      });
+
+      Array.from(uniqueEspIds).sort().forEach(id => {
+          const option = document.createElement("option");
+          option.value = id;
+          espIdDatalist.appendChild(option);
+      });
+
+      // Restore the input value
+      newDeviceIdInput.value = currentInputValue;
+  }
+
+  // --- Populates the newLeds datalist based on unique combinations from existing markers ---
+  function populateNewLedsDropdown() {
+      const ledsDatalist = document.getElementById("ledSuggestions");
+      const newLedsInput = document.getElementById("newLeds");
+      const currentInputValue = newLedsInput.value;
+
+      ledsDatalist.innerHTML = ''; // Clear existing options
+
+      const uniqueLedCombinations = new Set();
+      // Collect all unique LED combinations (as strings) from existing markers
+      ledTimeline.forEach(marker => {
+          if (Array.isArray(marker.targetLEDS) && marker.targetLEDS.length > 0) {
+              uniqueLedCombinations.add(marker.targetLEDS.join(','));
+          }
+      });
+
+      // Add options for each unique LED combination
+      Array.from(uniqueLedCombinations).sort().forEach(combination => {
+          const option = document.createElement("option");
+          option.value = combination;
+          ledsDatalist.appendChild(option);
+      });
+
+      // Restore the input value
+      newLedsInput.value = currentInputValue;
+  }
+
+
+  // Main function to render (or re-render) all markers based on current filters
+  function renderMarkers() {
+    const container = document.getElementById("ledMarkers");
+    const espFilter = document.getElementById("filterEsp").value;
+    const timeMin = parseFloat(document.getElementById("timeMin").value) || -Infinity;
+    const timeMax = parseFloat(document.getElementById("timeMax").value) || Infinity;
+
+    // Store current filter selection before clearing/repopulating
+    document.getElementById("filterEsp").dataset.currentFilter = espFilter;
+
+    // Sort markers by start time, then by device ID for consistent display
+    const sortedMarkers = [...ledTimeline].sort((a, b) => {
+      if (a.start_sec !== b.start_sec) return a.start_sec - b.start_sec;
+      return a.device_id.localeCompare(b.device_id);
+    });
+
+    container.innerHTML = "<h2>📋 LED Timeline Markers</h2>"; // Clear and re-add heading
+
+    sortedMarkers.forEach((marker) => {
+      // Apply filters
+      if (espFilter && marker.device_id !== espFilter) return;
+      if (marker.start_sec < timeMin || marker.start_sec > timeMax) return;
+
+      const intervalIndex = Math.floor(marker.start_sec / INTERVAL_DURATION);
+      const intervalColor = getIntervalColor(intervalIndex); // Background color
+      const espColor = marker.device_id ? getEspColor(marker.device_id) : "#444"; // Left border color
+
+      const targetLedsDisplay = Array.isArray(marker.targetLEDS) ? marker.targetLEDS.join(',') : '';
+      const duration = (marker.end_sec - marker.start_sec).toFixed(2);
+      const params = marker.params || {}; // Ensure params object exists
+
+      // Build HTML for effect-specific parameters dynamically
+      let effectSpecificParamsHtml = '';
+      if (marker.effect === "STATIC") {
+        const color = params.color || [255, 255, 255];
+        const hexColor = rgbToHex(color[0], color[1], color[2]);
+        effectSpecificParamsHtml = `
+          <label>Color <input type="color" value="${hexColor}" onchange="updateMarker(${marker.id}, 'params.color', this.value)"></label>
+        `;
+      } else if (marker.effect === "BLINK") {
+        const onColor = params.on_color || [255, 255, 255];
+        const offColor = params.off_color || [0, 0, 0];
+        effectSpecificParamsHtml = `
+          <label>On Color <input type="color" value="${rgbToHex(onColor[0], onColor[1], onColor[2])}" onchange="updateMarker(${marker.id}, 'params.on_color', this.value)"></label>
+          <label>Off Color <input type="color" value="${rgbToHex(offColor[0], offColor[1], offColor[2])}" onchange="updateMarker(${marker.id}, 'params.off_color', this.value)"></label>
+          <label>Base Rate (chunks) <input type="number" value="${params.base_rate || 8}" step="1" onchange="updateMarker(${marker.id}, 'params.base_rate', parseInt(this.value))"></label>
+          <label>Min Rate (chunks) <input type="number" value="${params.min_rate || 2}" step="1" onchange="updateMarker(${marker.id}, 'params.min_rate', parseInt(this.value))"></label>
+        `;
+      } else if (marker.effect === "RAINBOW") {
+        effectSpecificParamsHtml = `
+          <label>Hue Speed <input type="number" value="${params.hue_speed || 0.05}" step="0.01" onchange="updateMarker(${marker.id}, 'params.hue_speed', parseFloat(this.value))"></label>
+        `;
+      } else if (marker.effect === "CHASE") {
+        const chaseColor = params.chase_color || [255, 255, 255];
+        const currentDirection = params.direction || "FORWARD"; // Default if not set
+        effectSpecificParamsHtml = `
+          <label>Chase Color <input type="color" value="${rgbToHex(chaseColor[0], chaseColor[1], chaseColor[2])}" onchange="updateMarker(${marker.id}, 'params.chase_color', this.value)"></label>
+          <label>Tail Length <input type="number" value="${params.tail_length || 5}" step="1" onchange="updateMarker(${marker.id}, 'params.tail_length', parseInt(this.value))"></label>
+          <label>Direction
+            <select onchange="updateMarker(${marker.id}, 'params.direction', this.value)">
+              <option value="FORWARD" ${currentDirection === "FORWARD" ? "selected" : ""}>Forward</option>
+              <option value="BACKWARD" ${currentDirection === "BACKWARD" ? "selected" : ""}>Backward</option>
+            </select>
+          </label>
+          <label>Base Speed (chunks) <input type="number" value="${params.base_speed || 10}" step="1" onchange="updateMarker(${marker.id}, 'params.base_speed', parseInt(this.value))"></label>
+          <label>Max Speed (chunks) <input type="number" value="${params.max_speed || 3}" step="1" onchange="updateMarker(${marker.id}, 'params.max_speed', parseInt(this.value))"></label>
+        `;
+      }
+      else if (marker.effect === "SPARKLE") {
+  const sparkleColor = params.sparkle_color || [255, 255, 255];
+  const hexColor = rgbToHex(sparkleColor[0], sparkleColor[1], sparkleColor[2]);
+  const density = (params.density != null ? params.density : 0.1);
+  effectSpecificParamsHtml = `
+    <label>Sparkle Color <input type="color" value="${hexColor}" onchange="updateMarker(${marker.id}, 'params.sparkle_color', this.value)"></label>
+    <label>Density (0-1) <input type="number" value="${density}" step="0.01" min="0" max="1" onchange="updateMarker(${marker.id}, 'params.density', parseFloat(this.value))"></label>
+  `;
+} else if (marker.effect === "STROBE") {
+  const onColor = params.on_color || [255, 255, 255];
+  const offColor = params.off_color || [0, 0, 0];
+  effectSpecificParamsHtml = `
+    <label>On Color <input type="color" value="${rgbToHex(onColor[0], onColor[1], onColor[2])}" onchange="updateMarker(${marker.id}, 'params.on_color', this.value)"></label>
+    <label>Off Color <input type="color" value="${rgbToHex(offColor[0], offColor[1], offColor[2])}" onchange="updateMarker(${marker.id}, 'params.off_color', this.value)"></label>
+    <label>Base Rate <input type="number" value="${params.base_rate || 16}" step="1" onchange="updateMarker(${marker.id}, 'params.base_rate', parseInt(this.value))"></label>
+    <label>Min Rate <input type="number" value="${params.min_rate || 2}" step="1" onchange="updateMarker(${marker.id}, 'params.min_rate', parseInt(this.value))"></label>
+  `;
+} else if (marker.effect === "COMET") {
+  const cometColor = params.comet_color || [255, 100, 0];
+  effectSpecificParamsHtml = `
+    <label>Comet Color <input type="color" value="${rgbToHex(cometColor[0], cometColor[1], cometColor[2])}" onchange="updateMarker(${marker.id}, 'params.comet_color', this.value)"></label>
+    <label>Tail Length <input type="number" value="${params.tail_length || 5}" step="1" onchange="updateMarker(${marker.id}, 'params.tail_length', parseInt(this.value))"></label>
+    <label>Base Speed <input type="number" value="${params.base_speed || 1}" step="1" onchange="updateMarker(${marker.id}, 'params.base_speed', parseInt(this.value))"></label>
+    <label>Max Speed <input type="number" value="${params.max_speed || 5}" step="1" onchange="updateMarker(${marker.id}, 'params.max_speed', parseInt(this.value))"></label>
+  `;
+} else if (marker.effect === "FIRE") {
+  const baseColor = params.base_color || [255, 100, 0];
+  effectSpecificParamsHtml = `
+    <label>Base Color <input type="color" value="${rgbToHex(baseColor[0], baseColor[1], baseColor[2])}" onchange="updateMarker(${marker.id}, 'params.base_color', this.value)"></label>
+    <label>Flicker Intensity (0-1) <input type="number" value="${params.flicker_intensity != null ? params.flicker_intensity : 0.5}" step="0.01" min="0" max="1" onchange="updateMarker(${marker.id}, 'params.flicker_intensity', parseFloat(this.value))"></label>
+  `;
+}
+
+      // FFT has no configurable parameters
+
+      container.innerHTML += `
+        <div class="marker" style="background-color: ${intervalColor}; border-left-color: ${espColor};">
+          <div class="marker-header">
+            <h4>LED Marker (ID: ${marker.id})</h4>
+            <button class="delete-button" data-marker-id="${marker.id}">🗑️ Delete</button>
+          </div>
+          <label>Start Time (sec) <input type="number" value="${marker.start_sec.toFixed(2)}" step="0.1" onchange="updateMarker(${marker.id}, 'start_sec', parseFloat(this.value))"></label>
+          <label>Duration <input type="number" value="${duration}" step="0.1" onchange="updateMarker(${marker.id}, 'duration_calc', parseFloat(this.value))"></label>
+          <label>Target ESP32 ID <input type="text" value="${marker.device_id}" onchange="updateMarker(${marker.id}, 'device_id', this.value)"></label>
+          <label>Target LEDs (e.g., 0,99 or 10,20) <input type="text" value="${targetLedsDisplay}" onchange="updateMarker(${marker.id}, 'targetLEDS', this.value)"></label>
+          <label>Effect
+            <select onchange="updateMarker(${marker.id}, 'effect', this.value)">
+              <option value="STATIC" ${marker.effect === "STATIC" ? "selected" : ""}>Static</option>
+              <option value="FFT" ${marker.effect === "FFT" ? "selected" : ""}>FFT</option>
+              <option value="BLINK" ${marker.effect === "BLINK" ? "selected" : ""}>Blink</option>
+              <option value="RAINBOW" ${marker.effect === "RAINBOW" ? "selected" : ""}>Rainbow</option>
+              <option value="CHASE" ${marker.effect === "CHASE" ? "selected" : ""}>Chase</option>
+              <option value="SPARKLE" ${marker.effect === "SPARKLE" ? "selected" : ""}>Sparkle</option>
+              <option value="STROBE" ${marker.effect === "STROBE" ? "selected" : ""}>Strobe</option>
+              <option value="COMET" ${marker.effect === "COMET" ? "selected" : ""}>Comet</option>
+              <option value="FIRE" ${marker.effect === "FIRE" ? "selected" : ""}>Fire</option>
+            </select>
+          </label>
+          <div class="effect-params">
+            ${effectSpecificParamsHtml}
+          </div>
+        </div>
+      `;
+    });
+    addDeleteButtonListeners(); // Attach delete listeners after rendering
+    populateEspFilter(); // Update filter dropdown with current ESP IDs
+    populateNewEspIdDropdown(); // Populate the 'Add New Marker' ESP ID datalist
+    populateNewLedsDropdown(); // Populate the 'Add New Marker' LEDs datalist
+  }
+
+  // Attaches event listeners to all delete buttons
+  function addDeleteButtonListeners() {
+      document.querySelectorAll('.delete-button').forEach(button => {
+          button.onclick = (event) => {
+              const markerId = parseInt(event.target.dataset.markerId, 10);
+              deleteMarker(markerId);
+          };
+      });
+  }
+
+  // --- Marker Update and Deletion Functions ---
+  function updateMarker(markerId, field, value) {
+    const markerIndex = ledTimeline.findIndex(m => m.id === markerId);
+    if (markerIndex === -1) {
+        console.warn(`Marker with ID ${markerId} not found for update.`);
+        return;
+    }
+    const marker = ledTimeline[markerIndex];
+
+    if (field === 'duration_calc') {
+      marker.end_sec = marker.start_sec + value;
+    } else if (field === 'start_sec') {
+      marker.start_sec = value;
+      // Ensure end_sec also adjusts if start_sec changes, maintaining duration
+      // You might want to decide if duration should be fixed or end_sec should be fixed
+      // For now, let's keep duration fixed if only start_sec changes
+      marker.end_sec = marker.start_sec + (marker.end_sec - (marker.start_sec - (marker.end_sec - marker.start_sec))); // Recalculate based on original duration
+    }
+    else if (field.startsWith('params.')) {
+      const paramField = field.substring(7); // Remove 'params.' prefix
+      if (!marker.params) marker.params = {}; // Ensure params object exists
+      if (paramField.includes('color')) { // Handle color conversions
+        marker.params[paramField] = hexToRgb(value);
+      } else if (paramField === 'base_rate' || paramField === 'min_rate' || paramField === 'tail_length' || paramField === 'base_speed' || paramField === 'max_speed') {
+        marker.params[paramField] = parseInt(value);
+      } else if (paramField === 'hue_speed') {
+        marker.params[paramField] = parseFloat(value);
+      }
+      else {
+        marker.params[paramField] = value;
+      }
+    } else if (field === 'targetLEDS') {
+      // Convert comma-separated string to an array of numbers, with validation
+      const parts = value.split(',').map(s => parseInt(s.trim(), 10));
+      if (parts.every(num => !isNaN(num) && num >= 0)) {
+          marker.targetLEDS = [...new Set(parts)].sort((a,b) => a-b); // Ensure unique and sorted
+      } else {
+          alert("Invalid LED range format. Please use comma-separated positive numbers (e.g., 0,99).");
+          renderMarkers(); // Re-render to revert invalid input
+          return;
+      }
+    } else if (field === 'effect') {
+      marker.effect = value;
+      // Re-initialize params based on new effect type, preserving existing if applicable
+      marker.params = { ...getDefaultParams(value), ...marker.params }; // Merge defaults with existing params
+      renderMarkers(); // Re-render to show correct parameters for the new effect
+      return; // Exit as renderMarkers will handle the update
+    } else {
+      marker[field] = value;
+    }
+
+    // Refresh ESP ID and LED suggestions after any update that might add new values
+    populateNewEspIdDropdown();
+    populateNewLedsDropdown();
+
+    // Re-render only if the effect didn't change (as effect change triggers its own render)
+    if (field !== 'effect') {
+        renderMarkers();
+    }
+    console.log('Updated timeline:', ledTimeline); // For debugging
+  }
+
+
+  function deleteMarker(markerId) {
+    if (confirm("Are you sure you want to delete this marker?")) {
+      const initialLength = ledTimeline.length;
+      ledTimeline = ledTimeline.filter(marker => marker.id !== markerId);
+      if (ledTimeline.length < initialLength) { // Check if a marker was actually removed
+          renderMarkers(); // Re-render if successful deletion
+      } else {
+          console.warn(`Marker with ID ${markerId} not found for deletion.`);
+      }
+      populateNewEspIdDropdown(); // Update suggestions after deletion
+      populateNewLedsDropdown(); // Update suggestions after deletion
+    }
+  }
+
+  // --- Filter Control Functions ---
+  function resetFilters() {
+    document.getElementById("filterEsp").value = "";
+    document.getElementById("timeMin").value = "";
+    document.getElementById("timeMax").value = "";
+    renderMarkers(); // Re-render after resetting filters
+  }
+
+  // --- Project Export Function ---
+  function uploadProject() {
+    if (!selectedWavBlob || ledTimeline.length === 0) {
+      alert("Please select a .wav file and set timeline data.");
+      return;
+    }
+
+    const timeline = {
+      audioFile: selectedWavBlob.name,
+      events: ledTimeline
+    };
+    const formData = new FormData();
+    formData.append("file", selectedWavBlob);
+    formData.append("timeline", JSON.stringify(timeline));
+
+    // Show loading indicator
+    document.body.style.cursor = 'wait';
+    const exportButton = document.getElementById("exportTimelineButton");
+    const originalButtonText = exportButton.textContent;
+    exportButton.textContent = 'Uploading...';
+    exportButton.disabled = true;
+
+    fetch("http://localhost:8000/upload-project", {
+      method: "POST",
+      body: formData
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.status === "ok") {
+          window.location.href = "processing.html";
+        } else {
+          alert("❌ Upload failed.");
+        }
+      })
+      .catch(err => {
+        alert("❌ Upload error.");
+        console.error(err);
+      })
+      .finally(() => {
+        document.body.style.cursor = 'default';
+        exportButton.textContent = originalButtonText;
+        exportButton.disabled = false;
+      });
+  }
+
+  // --- Event Listeners ---
+  document.addEventListener('DOMContentLoaded', () => {
+    // Initialize effect-specific inputs for the Add New Marker form
+    updateEffectInputs();
+    // Render any pre-existing markers (or an empty list) on page load
+    renderMarkers(); // This call will internally trigger datalist populations too
+
+    // Attach event listeners to buttons and inputs
+    document.getElementById('audioFile').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      if (!file.name.toLowerCase().endsWith('.wav')) {
+          alert("Please select a .wav file.");
+          e.target.value = ''; // Clear the input
+          selectedWavBlob = null;
+          return;
+      }
+      selectedWavBlob = file;
+      const audioUrl = URL.createObjectURL(file);
+      wavesurfer.load(audioUrl);
+    });
+
+    document.getElementById('playPauseButton').addEventListener('click', () => wavesurfer.playPause());
+    document.getElementById('addMarkerButton').addEventListener('click', addCustomMarkerFromForm);
+    document.getElementById('newEffect').addEventListener('change', updateEffectInputs); // For the new marker form
+
+    // Filter event listeners
+    document.getElementById('filterEsp').addEventListener('change', renderMarkers);
+    document.getElementById('timeMin').addEventListener('input', renderMarkers); // Use 'input' for real-time filtering
+    document.getElementById('timeMax').addEventListener('input', renderMarkers); // Use 'input' for real-time filtering
+    document.getElementById('resetFiltersButton').addEventListener('click', resetFilters);
+
+    document.getElementById('exportTimelineButton').addEventListener('click', uploadProject);
+
+
+    document.getElementById('saveProjectAsButton').addEventListener('click', saveProjectAs);
+    document.getElementById('loadProjectButton').addEventListener('click', loadProject);
+    document.getElementById('newProjectButton').addEventListener('click', newProject);
+
+    // Initial population of the new marker datalists on load
+    populateNewEspIdDropdown();
+    populateNewLedsDropdown();
+  });
+</script>
+
+</body>
+</html>
