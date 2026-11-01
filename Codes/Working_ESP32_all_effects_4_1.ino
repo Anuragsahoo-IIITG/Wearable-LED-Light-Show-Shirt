@@ -21,12 +21,12 @@
 // === USER CONFIGURATION ===
 
 // Your Wi-Fi credentials:
-static const char*  WIFI_SSID      = "Home-Router";
-static const char*  WIFI_PASSWORD  = "Eveningcuckoo@123";
+static const char*  WIFI_SSID      = "Your_Wifi_Name";
+static const char*  WIFI_PASSWORD  = "Your_Password";
 
 // The WebSocket URL of your FastAPI server:
 //    e.g. "ws://192.168.1.100:8000/ws/esp32"
-static const char*  WS_SERVER_ADDR = "192.168.1.2";  
+static const char*  WS_SERVER_ADDR = "x.x.x.x";  
 static const uint16_t WS_SERVER_PORT = 8000;
 static const char*   WS_PATH       = "/ws/esp32";
 
